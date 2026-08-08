@@ -248,37 +248,9 @@
                     </div>
                 </div>
 
-                <!-- Filter Lanjutan & Cetak PDF Rekap -->
-                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
-                    <p class="text-xs font-bold text-slate-700"><i class="fa-solid fa-filter text-blue-600"></i> Filter & Cetak Laporan Rekap</p>
-                    
-                    <div>
-                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Filter Berdasarkan Nama Guru</label>
-                        <select id="filterGuru" onchange="filterDataRekap()" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs outline-none">
-                            <option value="">-- Semua Guru --</option>
-                        </select>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Dari Tanggal</label>
-                            <input type="date" id="filterTglMulai" onchange="filterDataRekap()" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Sampai Tanggal</label>
-                            <input type="date" id="filterTglSelesai" onchange="filterDataRekap()" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs outline-none">
-                        </div>
-                    </div>
-
-                    <div class="flex gap-2 pt-1">
-                        <input type="text" id="filterKeyword" oninput="filterDataRekap()" placeholder="Cari mapel / materi..." class="flex-1 bg-white border border-slate-300 rounded-lg p-2 text-xs outline-none">
-                        <button onclick="resetFilter()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold">Reset</button>
-                    </div>
-
-                    <!-- Tombol Cetak PDF Berdasarkan Filter -->
-                    <button onclick="cetakRekapPDF()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-lg text-xs shadow transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-file-pdf"></i> Cetak Rekap Terpilih ke PDF
-                    </button>
+                <!-- Filter Pencarian -->
+                <div class="space-y-2 pt-2">
+                    <input type="text" id="filterKeyword" oninput="filterDataRekap()" placeholder="Cari nama guru, mapel, atau materi..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs outline-none">
                 </div>
             </div>
 
@@ -293,7 +265,7 @@
 
     </main>
 
-    <!-- Template Cetak PDF Tunggal (Formulir) -->
+    <!-- Template Cetak PDF/Word -->
     <div id="printArea" class="hidden bg-white p-8 max-w-[210mm] mx-auto text-slate-900 text-sm font-serif">
         <table class="w-full border-collapse mb-1">
             <tr>
@@ -329,40 +301,9 @@
         </div>
     </div>
 
-    <!-- Template Cetak PDF Rekap Laporan (Berdasarkan Filter) -->
-    <div id="printAreaRekap" class="hidden bg-white p-8 max-w-[210mm] mx-auto text-slate-900 text-xs font-sans">
-        <div class="text-center mb-4">
-            <p class="text-xs font-bold uppercase tracking-wide m-0">Pemerintah Kota Bandar Lampung</p>
-            <h2 class="text-sm font-extrabold uppercase tracking-wider m-0">SMP Negeri 8 Bandar Lampung</h2>
-            <h3 class="text-base font-bold uppercase mt-2">REKAPITULASI JURNAL KBM</h3>
-            <p id="pInfoFilter" class="text-[11px] text-slate-600 mt-1"></p>
-        </div>
-        <div class="border-b-2 border-slate-800 pb-2 mb-4"></div>
-        <table class="w-full border-collapse border border-slate-400 text-[10px]">
-            <thead>
-                <tr class="bg-slate-200 text-slate-800">
-                    <th class="border border-slate-400 p-1.5">No</th>
-                    <th class="border border-slate-400 p-1.5">Tanggal</th>
-                    <th class="border border-slate-400 p-1.5">Nama Guru</th>
-                    <th class="border border-slate-400 p-1.5">Kelas/Mapel</th>
-                    <th class="border border-slate-400 p-1.5">Materi & Absen</th>
-                </tr>
-            </thead>
-            <tbody id="pTabelRekapBody">
-                <!-- Data dimasukkan via JS -->
-            </tbody>
-        </table>
-        <div class="flex justify-end mt-8">
-            <div class="text-center">
-                <p class="mb-1 text-[11px]">Bandar Lampung, <span id="pTglCetakRekap"></span></p>
-                <p class="mb-12 text-[11px] font-semibold">Mengetahui,<br>Kepala Sekolah / Piket</p>
-                <p class="text-[11px] font-bold border-b border-slate-900 pb-0.5 px-6 inline-block">_________________________</p>
-            </div>
-        </div>
-    </div>
-
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxj6QWbWVSA6Q0mZKGD9hGdlj8V1MceEe3KkLqcYRVFv4bJGQujoU1f0g99eeS3KhWEYw/exec';
+        // URL Web App Google Apps Script yang sudah diperbarui
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzGmEGsKyBVrTF6LlSTQOcYqsifFX3pNLdqV8ANaXceaNddlMKG6olAtlVpyw26vFDjZQ/exec';
 
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const tglSekarang = new Date().toLocaleDateString('id-ID', options);
@@ -389,6 +330,7 @@
             document.getElementById('placeholderTtd').classList.remove('hidden');
         }
 
+        // --- SISTEM TAB NAVIGASI ---
         function switchTab(tab) {
             const formSec = document.getElementById('sectionForm');
             const rekapSec = document.getElementById('sectionRekap');
@@ -405,10 +347,11 @@
                 rekapSec.classList.remove('hidden');
                 rekapBtn.className = "flex-1 py-2 rounded-md font-semibold bg-white text-blue-900 shadow transition-all";
                 formBtn.className = "flex-1 py-2 rounded-md font-semibold text-blue-200 hover:text-white transition-all";
-                muatDataRekap();
+                muatDataRekap(); // Ambil data saat tab rekap dibuka
             }
         }
 
+        // --- AUTO-SAVE & DRAF ---
         function saveDraft() {
             const draft = {
                 namaGuru: document.getElementById('namaGuru').value,
@@ -463,245 +406,187 @@
             container.appendChild(div);
         }
 
-        let dataTerakhir = {};
-
-        function simpanJurnal(event) {
-            event.preventDefault();
+        async function simpanJurnal(e) {
+            e.preventDefault();
+            const jamMulai = parseInt(document.getElementById('jamMulai').value);
+            const jamSelesai = parseInt(document.getElementById('jamSelesai').value);
+            if (jamSelesai < jamMulai) {
+                alert("Kesalahan Jam Pelajaran: Jam Selesai tidak boleh lebih kecil dari Jam Mulai!");
+                return;
+            }
             if (signaturePad.isEmpty()) {
-                alert("Mohon isi tanda tangan terlebih dahulu!");
+                alert("Mohon lengkapi Tanda Tangan Virtual terlebih dahulu!");
                 return;
             }
 
             const btnSubmit = document.getElementById('btnSubmit');
             btnSubmit.disabled = true;
-            btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+            btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Mengirim Data ke Cloud...`;
 
             let daftarAbsen = [];
             document.querySelectorAll('.item-absen').forEach(item => {
-                const nama = item.querySelector('.nama-siswa').value.trim();
+                const nama = item.querySelector('.nama-siswa').value;
                 const status = item.querySelector('.status-absen').value;
                 if(nama) daftarAbsen.push(`${nama} ${status}`);
             });
-            const strAbsen = daftarAbsen.length > 0 ? daftarAbsen.join(', ') : 'Hadir Semua (Nihil)';
 
-            dataTerakhir = {
-                tanggal: tglSekarang,
-                namaGuru: document.getElementById('namaGuru').value,
-                kelas: document.getElementById('kelas').value,
-                mapel: document.getElementById('mapel').value,
-                jam: `${document.getElementById('jamMulai').value} - ${document.getElementById('jamSelesai').value}`,
-                materi: document.getElementById('materi').value,
-                absen: strAbsen,
-                catatan: document.getElementById('catatan').value || '-',
-                ttd: signaturePad.toDataURL()
+            const guruVal = document.getElementById('namaGuru').value;
+            const kelasVal = document.getElementById('kelas').value;
+            const mapelVal = document.getElementById('mapel').value;
+            const jamVal = `Jam ${jamMulai} - ${jamSelesai}`;
+            const materiVal = document.getElementById('materi').value;
+            const absenVal = daftarAbsen.join(', ') || 'Nihil (Hadir Semua)';
+            const catatanVal = document.getElementById('catatan').value || '-';
+            const ttdVal = signaturePad.toDataURL();
+
+            document.getElementById('pTanggal').textContent = tglSekarang;
+            document.getElementById('pNamaGuru').textContent = guruVal;
+            document.getElementById('pMapel').textContent = mapelVal;
+            document.getElementById('pKelas').textContent = kelasVal;
+            document.getElementById('pJam').textContent = jamVal;
+            document.getElementById('pMateri').textContent = materiVal;
+            document.getElementById('pAbsen').textContent = absenVal;
+            document.getElementById('pCatatan').textContent = catatanVal;
+            document.getElementById('pTglTtd').textContent = tglSekarang;
+            document.getElementById('pTtdImg').src = ttdVal;
+
+            const payload = {
+                action: "tambah",
+                namaGuru: guruVal,
+                kelas: kelasVal,
+                mapel: mapelVal,
+                jamKe: jamVal,
+                materi: materiVal,
+                siswaAbsen: absenVal,
+                catatan: catatanVal,
+                tandaTangan: ttdVal
             };
 
-            fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dataTerakhir) })
-            .then(() => {
+            try {
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                localStorage.removeItem('jurnal_draft_smpn8');
                 document.getElementById('jurnalForm').classList.add('hidden');
                 document.getElementById('alertSuccess').classList.remove('hidden');
-                localStorage.removeItem('jurnal_draft_smpn8');
+            } catch (error) {
+                alert("Gagal mengirim data. Pastikan koneksi internet aktif.");
+                console.error('Error!', error.message);
+            } finally {
                 btnSubmit.disabled = false;
-                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Simpan & Kirim ke Google Sheets';
-            })
-            .catch(error => {
-                alert('Gagal menyimpan data: ' + error);
-                btnSubmit.disabled = false;
-                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Simpan & Kirim ke Google Sheets';
+                btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Simpan & Kirim ke Google Sheets`;
+            }
+        }
+
+        // --- AMBIL DATA UNTUK REKAP ---
+        let allDataJurnal = [];
+
+        async function muatDataRekap() {
+            const container = document.getElementById('containerListRekap');
+            container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-slate-400 text-xs"><i class="fa-solid fa-spinner fa-spin text-lg mb-1"></i><p>Memuat data dari Google Sheets...</p></div>`;
+            
+            try {
+                const response = await fetch(scriptURL);
+                const result = await response.json();
+                
+                if(result.status === "success") {
+                    allDataJurnal = result.data || [];
+                    tampilkanDataRekap(allDataJurnal);
+                    hitungStatistik(allDataJurnal);
+                } else {
+                    container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-red-500 text-xs"><p>Gagal memuat data: ${result.message}</p></div>`;
+                }
+            } catch (error) {
+                container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-red-500 text-xs"><p>Terjadi kesalahan koneksi saat menarik data.</p></div>`;
+            }
+        }
+
+        function tampilkanDataRekap(data) {
+            const container = document.getElementById('containerListRekap');
+            if(data.length === 0) {
+                container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-slate-400 text-xs"><p>Belum ada data jurnal tersimpan.</p></div>`;
+                return;
+            }
+
+            let html = '';
+            // Urutkan dari data terbaru (opsional, jika perlu dibalik)
+            [...data].reverse().forEach((item, index) => {
+                html += `
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2 shadow-sm text-xs">
+                        <div class="flex justify-between items-center text-slate-500 border-b pb-1.5">
+                            <span class="font-semibold text-blue-800"><i class="fa-solid fa-calendar-days"></i> ${item.tanggal || '-'}</span>
+                            <span class="bg-slate-100 px-2 py-0.5 rounded font-bold text-slate-700">Kelas ${item.kelas || '-'}</span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-800 text-sm">${item.namaGuru || '-'}</p>
+                            <p class="text-blue-600 font-semibold">${item.mapel || '-'} (${item.jamKe || '-'})</p>
+                        </div>
+                        <div class="bg-slate-50 p-2 rounded border border-slate-100 text-slate-600">
+                            <span class="font-semibold text-slate-700">Materi:</span> ${item.materi || '-'}
+                        </div>
+                        <div class="text-[11px] text-slate-500 flex justify-between pt-1">
+                            <span>Absen: ${item.siswaAbsen || 'Nihil'}</span>
+                        </div>
+                    </div>
+                `;
             });
+            container.innerHTML = html;
         }
 
-        function resetFormBaru() {
-            document.getElementById('jurnalForm').reset();
-            clearSignature();
-            document.getElementById('containerAbsen').innerHTML = '';
-            document.getElementById('alertSuccess').classList.add('hidden');
-            document.getElementById('jurnalForm').classList.remove('hidden');
+        function hitungStatistik(data) {
+            document.getElementById('statTotal').textContent = data.length;
+            const uniqueGuru = new Set(data.map(item => item.namaGuru));
+            document.getElementById('statGuru').textContent = uniqueGuru.size;
         }
 
+        function filterDataRekap() {
+            const keyword = document.getElementById('filterKeyword').value.toLowerCase();
+            const filtered = allDataJurnal.filter(item => {
+                return (
+                    (item.namaGuru && item.namaGuru.toLowerCase().includes(keyword)) ||
+                    (item.mapel && item.mapel.toLowerCase().includes(keyword)) ||
+                    (item.materi && item.materi.toLowerCase().includes(keyword)) ||
+                    (item.kelas && item.kelas.toLowerCase().includes(keyword))
+                );
+            });
+            tampilkanDataRekap(filtered);
+        }
+
+        // --- FITUR DOWNLOAD PDF & WORD ---
         function downloadPDF() {
-            document.getElementById('pTanggal').textContent = dataTerakhir.tanggal;
-            document.getElementById('pMapel').textContent = dataTerakhir.mapel;
-            document.getElementById('pKelas').textContent = dataTerakhir.kelas;
-            document.getElementById('pJam').textContent = dataTerakhir.jam;
-            document.getElementById('pMateri').textContent = dataTerakhir.materi;
-            document.getElementById('pAbsen').textContent = dataTerakhir.absen;
-            document.getElementById('pCatatan').textContent = dataTerakhir.catatan;
-            document.getElementById('pTglTtd').textContent = dataTerakhir.tanggal;
-            document.getElementById('pTtdImg').src = dataTerakhir.ttd;
-            document.getElementById('pNamaGuru').textContent = dataTerakhir.namaGuru;
-
             const element = document.getElementById('printArea');
             element.classList.remove('hidden');
-            html2pdf().from(element).set({
+            const opt = {
                 margin: 10,
-                filename: `Jurnal_${dataTerakhir.kelas}_${dataTerakhir.mapel}.pdf`,
+                filename: `Jurnal_KBM_${document.getElementById('kelas').value}_${document.getElementById('namaGuru').value.replace(/[^a-zA-Z]/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).save().then(() => {
+            };
+            html2pdf().from(element).set(opt).save().then(() => {
                 element.classList.add('hidden');
             });
         }
 
         function downloadWord() {
-            const content = `
-                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                <head><title>Jurnal KBM</title><style>body{font-family:'Times New Roman',serif;font-size:12pt;}</style></head>
-                <body>
-                    <div style="text-align:center;">
-                        <b>PEMERINTAH KOTA BANDAR LAMPUNG</b><br>
-                        <b>SMP NEGERI 8 BANDAR LAMPUNG</b><br>
-                        <span style="font-size:10pt;">Jl. Untung Suropati Gg. Bumi Manti II No.16 Kampung Baru</span><br><hr>
-                    </div>
-                    <h3 style="text-align:center;">JURNAL KEGIATAN BELAJAR MENGAJAR (KBM)</h3>
-                    <p><b>Hari / Tanggal:</b> ${dataTerakhir.tanggal}</p>
-                    <p><b>Guru Mata Pelajaran:</b> ${dataTerakhir.namaGuru}</p>
-                    <p><b>Kelas / Mapel:</b> ${dataTerakhir.kelas} - ${dataTerakhir.mapel}</p>
-                    <p><b>Jam Ke:</b> ${dataTerakhir.jam}</p>
-                    <p><b>Ringkasan Materi:</b> ${dataTerakhir.materi}</p>
-                    <p><b>Siswa Tidak Hadir:</b> ${dataTerakhir.absen}</p>
-                    <p><b>Catatan Perilaku:</b> ${dataTerakhir.catatan}</p>
-                    <br><br>
-                    <div style="float:right; text-align:center;">
-                        Bandar Lampung, ${dataTerakhir.tanggal}<br>Guru Mata Pelajaran<br><br><br>
-                        <b><u>${dataTerakhir.namaGuru}</u></b>
-                    </div>
-                </body></html>`;
-            const converted = htmlDocx.asBlob(content);
-            saveAs(converted, `Jurnal_${dataTerakhir.kelas}_${dataTerakhir.mapel}.docx`);
-        }
-
-        let seluruhData = [];
-
-        function muatDataRekap() {
-            const container = document.getElementById('containerListRekap');
-            container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-slate-400 text-xs"><i class="fa-solid fa-spinner fa-spin text-lg mb-1"></i><p>Memuat data dari Google Sheets...</p></div>`;
-
-            fetch(scriptURL)
-            .then(res => res.json())
-            .then(data => {
-                seluruhData = data.reverse();
-                isiOpsiFilterGuru(seluruhData);
-                tampilkanDataRekap(seluruhData);
-                updateStatistik(seluruhData);
-            })
-            .catch(err => {
-                container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-red-500 text-xs"><p>Gagal memuat rekap data.</p></div>`;
-            });
-        }
-
-        function updateStatistik(data) {
-            document.getElementById('statTotal').textContent = data.length;
-            const uniqueGuru = [...new Set(data.map(item => item.namaGuru))];
-            document.getElementById('statGuru').textContent = uniqueGuru.length;
-        }
-
-        function isiOpsiFilterGuru(data) {
-            const select = document.getElementById('filterGuru');
-            const currentVal = select.value;
-            const uniqueGuru = [...new Set(data.map(item => item.namaGuru))].sort();
-            select.innerHTML = '<option value="">-- Semua Guru --</option>';
-            uniqueGuru.forEach(guru => {
-                select.innerHTML += `<option value="${guru}">${guru}</option>`;
-            });
-            select.value = currentVal;
-        }
-
-        function tampilkanDataRekap(data) {
-            const container = document.getElementById('containerListRekap');
-            if (data.length === 0) {
-                container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-slate-400 text-xs"><p>Tidak ada data jurnal yang ditemukan.</p></div>`;
-                return;
-            }
-
-            container.innerHTML = '';
-            data.forEach((item, index) => {
-                container.innerHTML += `
-                    <div class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-2 text-xs shadow-sm">
-                        <div class="flex justify-between items-start border-b pb-2">
-                            <div>
-                                <span class="font-bold text-blue-900">${item.namaGuru}</span>
-                                <p class="text-[10px] text-slate-500">${item.tanggal}</p>
-                            </div>
-                            <span class="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-[10px]">${item.kelas} - ${item.mapel}</span>
-                        </div>
-                        <p class="text-slate-700"><b>Materi:</b> ${item.materi}</p>
-                        <p class="text-slate-500 text-[11px]"><b>Absen:</b> ${item.absen}</p>
-                    </div>
-                `;
-            });
-        }
-
-        function filterDataRekap() {
-            const guru = document.getElementById('filterGuru').value;
-            const tglMulai = document.getElementById('filterTglMulai').value;
-            const tglSelesai = document.getElementById('filterTglSelesai').value;
-            const keyword = document.getElementById('filterKeyword').value.toLowerCase();
-
-            let filtered = seluruhData.filter(item => {
-                const matchGuru = !guru || item.namaGuru === guru;
-                const matchKeyword = !keyword || item.mapel.toLowerCase().includes(keyword) || item.materi.toLowerCase().includes(keyword);
-                return matchGuru && matchKeyword;
-            });
-
-            tampilkanDataRekap(filtered);
-            updateStatistik(filtered);
-        }
-
-        function resetFilter() {
-            document.getElementById('filterGuru').value = '';
-            document.getElementById('filterTglMulai').value = '';
-            document.getElementById('filterTglSelesai').value = '';
-            document.getElementById('filterKeyword').value = '';
-            tampilkanDataRekap(seluruhData);
-            updateStatistik(seluruhData);
-        }
-
-        function cetakRekapPDF() {
-            const tbody = document.getElementById('pTabelRekapBody');
-            tbody.innerHTML = '';
-            
-            const guru = document.getElementById('filterGuru').value;
-            const keyword = document.getElementById('filterKeyword').value.toLowerCase();
-
-            let filtered = seluruhData.filter(item => {
-                const matchGuru = !guru || item.namaGuru === guru;
-                const matchKeyword = !keyword || item.mapel.toLowerCase().includes(keyword) || item.materi.toLowerCase().includes(keyword);
-                return matchGuru && matchKeyword;
-            });
-
-            if (filtered.length === 0) {
-                alert("Tidak ada data untuk dicetak!");
-                return;
-            }
-
-            filtered.forEach((item, i) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="border border-slate-400 p-1 text-center">${i + 1}</td>
-                        <td class="border border-slate-400 p-1">${item.tanggal}</td>
-                        <td class="border border-slate-400 p-1 font-semibold">${item.namaGuru}</td>
-                        <td class="border border-slate-400 p-1">${item.kelas} / ${item.mapel}</td>
-                        <td class="border border-slate-400 p-1"><b>Materi:</b> ${item.materi}<br><b>Absen:</b> ${item.absen}</td>
-                    </tr>
-                `;
-            });
-
-            document.getElementById('pInfoFilter').textContent = guru ? `Guru: ${guru}` : 'Semua Guru';
-            document.getElementById('pTglCetakRekap').textContent = tglSekarang;
-
-            const element = document.getElementById('printAreaRekap');
+            const element = document.getElementById('printArea');
             element.classList.remove('hidden');
-            html2pdf().from(element).set({
-                margin: 10,
-                filename: 'Rekap_Jurnal_KBM_SMPN8.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            }).save().then(() => {
-                element.classList.add('hidden');
-            });
+            const contentHTML = element.innerHTML;
+            const converted = htmlDocx.asBlob(contentHTML);
+            saveAs(converted, `Jurnal_KBM_${document.getElementById('kelas').value}_${document.getElementById('namaGuru').value.replace(/[^a-zA-Z]/g, '_')}.docx`);
+            element.classList.add('hidden');
+        }
+
+        function resetFormBaru() {
+            document.getElementById('alertSuccess').classList.add('hidden');
+            document.getElementById('jurnalForm').classList.remove('hidden');
+            document.getElementById('jurnalForm').reset();
+            clearSignature();
+            document.getElementById('containerAbsen').innerHTML = '';
         }
     </script>
 </body>
