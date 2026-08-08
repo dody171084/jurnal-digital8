@@ -592,7 +592,7 @@
                 );
 
                 let matchTanggal = true;
-                if (item.tanggal && (tglMulai || tglSelesai)) {
+                if (item.timestamp && (tglMulai || tglSelesai)) {
                     // Ekstraksi format tanggal string ke objek Date standar jika memungkinkan, atau pencocokan teks sederhana
                     // Asumsi format tanggal tersimpan "Senin, 10 Agustus 2026" atau ISO. Kita bandingkan jika formatnya terdeteksi.
                     // Untuk amannya, kita gunakan konversi tanggal standar.
@@ -626,7 +626,7 @@
                 html += `
                     <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2 shadow-sm text-xs">
                         <div class="flex justify-between items-center text-slate-500 border-b pb-1.5">
-                            <span class="font-semibold text-blue-800"><i class="fa-solid fa-calendar-days"></i> ${item.tanggal || '-'}</span>
+                            <span class=“font-semibold text-blue-800”><i class=“fa-solid fa-calendar-days”></i> ${item.timestamp || ‘-’}</span>
                             <span class="bg-slate-100 px-2 py-0.5 rounded font-bold text-slate-700">Kelas ${item.kelas || '-'}</span>
                         </div>
                         <div>
@@ -668,7 +668,7 @@
                 tbodyHTML += `
                     <tr>
                         <td class="border border-slate-400 p-1 text-center">${index + 1}</td>
-                        <td class="border border-slate-400 p-1">${item.tanggal || '-'}</td>
+                        <td class=“border border-slate-400 p-1”>${item.timestamp || ‘-’}</td>
                         <td class="border border-slate-400 p-1 font-semibold">${item.namaGuru || '-'}</td>
                         <td class="border border-slate-400 p-1">${item.kelas || '-'} / ${item.mapel || '-'}</td>
                         <td class="border border-slate-400 p-1"><b>Materi:</b> ${item.materi || '-'}<br><b>Absen:</b> ${item.siswaAbsen || 'Nihil'}</td>
