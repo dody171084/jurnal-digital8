@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Library untuk Ekspor Word & PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js@0.3.1/dist/html-docx.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body class="bg-slate-100 min-h-screen pb-10 text-slate-800 font-sans">
@@ -18,7 +18,9 @@
     <header class="bg-blue-800 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="max-w-md mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAAPAA8BAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=" alt="Logo SMPN 8" class="w-10 h-10 object-contain bg-white rounded-full p-0.5 shadow">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-800 font-bold shadow">
+                    <i class="fa-solid fa-school text-sm"></i>
+                </div>
                 <div>
                     <h1 class="font-bold text-base leading-tight">Jurnal Kelas Digital</h1>
                     <p class="text-xs text-blue-200">SMP Negeri 8 Bandar Lampung</p>
@@ -33,16 +35,16 @@
     <!-- Main Form Container -->
     <main class="max-w-md mx-auto p-4 space-y-4">
 
-        <!-- Card Informatif Tanggal -->
+        <!-- Card Informatif Tanggal & Draft Status -->
         <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex justify-between items-center text-sm">
             <div>
                 <p class="text-slate-500 text-xs">Hari & Tanggal</p>
                 <p class="font-semibold text-slate-700" id="currentDate"></p>
             </div>
             <div class="text-right">
-                <p class="text-slate-500 text-xs">Database Status</p>
-                <span class="inline-flex items-center gap-1 text-emerald-600 text-xs font-semibold">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Terhubung
+                <p class="text-slate-500 text-xs">Status Draft</p>
+                <span id="draftStatus" class="inline-flex items-center gap-1 text-xs font-semibold text-amber-600">
+                    <i class="fa-solid fa-cloud"></i> Auto-Save Aktif
                 </span>
             </div>
         </div>
@@ -50,14 +52,17 @@
         <!-- Form Input Jurnal -->
         <form id="jurnalForm" onsubmit="simpanJurnal(event)" class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 space-y-4">
             
-            <h2 class="font-bold text-slate-800 text-sm border-b pb-2 flex items-center gap-2">
-                <i class="fa-solid fa-pen-to-square text-blue-600"></i> Pengisian KBM Harian
+            <h2 class="font-bold text-slate-800 text-sm border-b pb-2 flex items-center justify-between">
+                <span class="flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-blue-600"></i> Pengisian KBM Harian
+                </span>
+                <button type="button" onclick="resetDraftManual()" class="text-[10px] text-red-500 hover:underline font-normal">Reset Form</button>
             </h2>
 
             <!-- 0. Pilih Nama Guru -->
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Guru Mata Pelajaran <span class="text-red-500">*</span></label>
-                <select id="namaGuru" required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                <select id="namaGuru" required onchange="saveDraft()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                     <option value="">-- Pilih Nama Guru --</option>
                     <option value="Dra. Hj. Zaitun">Dra. Hj. Zaitun</option>
                     <option value="Atiah, S.Ag., M.Pd">Atiah, S.Ag., M.Pd</option>
@@ -115,7 +120,7 @@
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Kelas <span class="text-red-500">*</span></label>
-                    <select id="kelas" required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                    <select id="kelas" required onchange="saveDraft()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                         <option value="">-- Pilih Kelas --</option>
                         <optgroup label="Tingkat 7 (7A - 7I)">
                             <option value="7A">Kelas 7A</option><option value="7B">Kelas 7B</option><option value="7C">Kelas 7C</option>
@@ -137,7 +142,7 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Mata Pelajaran <span class="text-red-500">*</span></label>
-                    <select id="mapel" required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                    <select id="mapel" required onchange="saveDraft()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                         <option value="">-- Pilih Mapel --</option>
                         <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option>
                         <option value="Pendidikan Agama Kristen">Pendidikan Agama Kristen</option>
@@ -162,13 +167,13 @@
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Jam Ke- <span class="text-red-500">*</span></label>
                 <div class="grid grid-cols-2 gap-3">
-                    <select id="jamMulai" required class="bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                    <select id="jamMulai" required onchange="saveDraft()" class="bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                         <option value="">Dari Jam</option>
                         <option value="1">Jam ke-1</option><option value="2">Jam ke-2</option><option value="3">Jam ke-3</option>
                         <option value="4">Jam ke-4</option><option value="5">Jam ke-5</option><option value="6">Jam ke-6</option>
                         <option value="7">Jam ke-7</option><option value="8">Jam ke-8</option><option value="9">Jam ke-9</option><option value="10">Jam ke-10</option>
                     </select>
-                    <select id="jamSelesai" required class="bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                    <select id="jamSelesai" required onchange="saveDraft()" class="bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                         <option value="">Sampai Jam</option>
                         <option value="1">Jam ke-1</option><option value="2">Jam ke-2</option><option value="3">Jam ke-3</option>
                         <option value="4">Jam ke-4</option><option value="5">Jam ke-5</option><option value="6">Jam ke-6</option>
@@ -180,7 +185,7 @@
             <!-- 3. Ringkasan Materi -->
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Ringkasan Materi / Aktivitas <span class="text-red-500">*</span></label>
-                <textarea id="materi" required rows="3" placeholder="Contoh: Pengenalan Algoritma..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
+                <textarea id="materi" required rows="3" oninput="saveDraft()" placeholder="Contoh: Pengenalan Algoritma..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
             </div>
 
             <!-- 4. Absensi Ketidakhadiran -->
@@ -197,7 +202,7 @@
             <!-- 5. Catatan Perilaku -->
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Catatan Perilaku / Kejadian Khusus</label>
-                <input id="catatan" type="text" placeholder="Contoh: Kondusif." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                <input id="catatan" type="text" oninput="saveDraft()" placeholder="Contoh: Kondusif." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
 
             <!-- 6. Tanda Tangan Virtual -->
@@ -239,33 +244,27 @@
                 </button>
             </div>
 
-            <button onclick="resetForm()" class="w-full mt-2 bg-slate-200 hover:bg-slate-300 text-slate-700 py-2 rounded-lg font-semibold">
-                Isi Jurnal Baru Lagi
+            <button onclick="resetFormBaru()" class="w-full mt-2 bg-slate-200 hover:bg-slate-300 text-slate-700 py-2 rounded-lg font-semibold">
+                Isi Jurnal Kelas Lain
             </button>
         </div>
 
     </main>
 
-    <!-- Template Kop Surat Resmi Instansi (Logo Kiri & Kanan Dikosongkan) untuk Cetak PDF/Word -->
+    <!-- Template Kop Surat Resmi Instansi untuk Cetak PDF/Word -->
     <div id="printArea" class="hidden bg-white p-8 max-w-[210mm] mx-auto text-slate-900 text-sm font-serif">
-        <!-- Kop Surat -->
         <table class="w-full border-collapse mb-1">
             <tr>
-                <td class="w-20 align-middle text-left">
-                    <!-- Logo Kiri Dikosongkan -->
-                </td>
+                <td class="w-20 align-middle text-left"></td>
                 <td class="text-center align-middle">
                     <p class="text-xs font-bold uppercase tracking-wide m-0">Pemerintah Kota Bandar Lampung</p>
                     <h2 class="text-base font-extrabold uppercase tracking-wider m-0">SMP Negeri 8 Bandar Lampung</h2>
                     <p class="text-[10px] m-0 leading-tight">Jl. Untung Suropati Gg. Bumi Manti II No.16 Kampung Baru Kecamatan Labuhan Ratu</p>
                     <p class="text-[10px] m-0 leading-tight">E-mail : smpn.delapan@gmail.com — NPSN: 10807193</p>
                 </td>
-                <td class="w-20 align-middle text-right">
-                    <!-- Logo Kanan Dikosongkan -->
-                </td>
+                <td class="w-20 align-middle text-right"></td>
             </tr>
         </table>
-        <!-- Garis Kop Surat Ganda -->
         <div class="border-b-4 border-slate-900 pb-0.5 mb-6"></div>
 
         <div class="text-center mb-6">
@@ -281,7 +280,6 @@
             <tr><td class="py-1 font-semibold">Catatan Perilaku</td><td class="py-1">: <span id="pCatatan"></span></td></tr>
         </table>
 
-        <!-- Tanda Tangan & Nama Guru -->
         <div class="flex justify-end mt-10">
             <div class="text-center">
                 <p class="mb-1 text-xs">Bandar Lampung, <span id="pTglTtd"></span></p>
@@ -305,7 +303,6 @@
             canvas.width = canvas.offsetWidth * ratio;
             canvas.height = canvas.offsetHeight * ratio;
             canvas.getContext("2d").scale(ratio, ratio);
-            signaturePad.clear();
         }
         window.addEventListener("resize", resizeCanvas);
         resizeCanvas();
@@ -318,6 +315,51 @@
             signaturePad.clear();
             document.getElementById('placeholderTtd').classList.remove('hidden');
         }
+
+        // --- SISTEM AUTO-SAVE & LOCAL STORAGE ---
+        function saveDraft() {
+            const draft = {
+                namaGuru: document.getElementById('namaGuru').value,
+                kelas: document.getElementById('kelas').value,
+                mapel: document.getElementById('mapel').value,
+                jamMulai: document.getElementById('jamMulai').value,
+                jamSelesai: document.getElementById('jamSelesai').value,
+                materi: document.getElementById('materi').value,
+                catatan: document.getElementById('catatan').value
+            };
+            localStorage.setItem('jurnal_draft_smpn8', JSON.stringify(draft));
+            
+            const statusEl = document.getElementById('draftStatus');
+            statusEl.innerHTML = '<i class="fa-solid fa-check text-emerald-600"></i> Tersimpan';
+            setTimeout(() => {
+                statusEl.innerHTML = '<i class="fa-solid fa-cloud"></i> Auto-Save Aktif';
+            }, 2000);
+        }
+
+        function loadDraft() {
+            const saved = localStorage.getItem('jurnal_draft_smpn8');
+            if (saved) {
+                const data = JSON.parse(saved);
+                if(data.namaGuru) document.getElementById('namaGuru').value = data.namaGuru;
+                if(data.kelas) document.getElementById('kelas').value = data.kelas;
+                if(data.mapel) document.getElementById('mapel').value = data.mapel;
+                if(data.jamMulai) document.getElementById('jamMulai').value = data.jamMulai;
+                if(data.jamSelesai) document.getElementById('jamSelesai').value = data.jamSelesai;
+                if(data.materi) document.getElementById('materi').value = data.materi;
+                if(data.catatan) document.getElementById('catatan').value = data.catatan;
+            }
+        }
+
+        function resetDraftManual() {
+            if(confirm("Yakin ingin menghapus seluruh isian form?")) {
+                localStorage.removeItem('jurnal_draft_smpn8');
+                document.getElementById('jurnalForm').reset();
+                clearSignature();
+                document.getElementById('containerAbsen').innerHTML = '';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadDraft);
 
         function tambahSiswaAbsen() {
             const container = document.getElementById('containerAbsen');
@@ -339,6 +381,15 @@
 
         async function simpanJurnal(e) {
             e.preventDefault();
+
+            // Validasi Jam Pelajaran
+            const jamMulai = parseInt(document.getElementById('jamMulai').value);
+            const jamSelesai = parseInt(document.getElementById('jamSelesai').value);
+            if (jamSelesai < jamMulai) {
+                alert("Kesalahan Jam Pelajaran: Jam Selesai tidak boleh lebih kecil dari Jam Mulai!");
+                return;
+            }
+
             if (signaturePad.isEmpty()) {
                 alert("Mohon lengkapi Tanda Tangan Virtual terlebih dahulu!");
                 return;
@@ -346,7 +397,7 @@
 
             const btnSubmit = document.getElementById('btnSubmit');
             btnSubmit.disabled = true;
-            btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Mengirim Data...`;
+            btnSubmit.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Mengirim Data ke Cloud...`;
 
             let daftarAbsen = [];
             document.querySelectorAll('.item-absen').forEach(item => {
@@ -358,7 +409,7 @@
             const guruVal = document.getElementById('namaGuru').value;
             const kelasVal = document.getElementById('kelas').value;
             const mapelVal = document.getElementById('mapel').value;
-            const jamVal = `Jam ${document.getElementById('jamMulai').value} - ${document.getElementById('jamSelesai').value}`;
+            const jamVal = `Jam ${jamMulai} - ${jamSelesai}`;
             const materiVal = document.getElementById('materi').value;
             const absenVal = daftarAbsen.join(', ') || 'Nihil (Hadir Semua)';
             const catatanVal = document.getElementById('catatan').value || '-';
@@ -396,6 +447,9 @@
                     body: JSON.stringify(payload)
                 });
 
+                // Hapus draft setelah sukses terkirim
+                localStorage.removeItem('jurnal_draft_smpn8');
+
                 document.getElementById('jurnalForm').classList.add('hidden');
                 document.getElementById('alertSuccess').classList.remove('hidden');
             } catch (error) {
@@ -431,12 +485,16 @@
             element.classList.add('hidden');
         }
 
-        function resetForm() {
+        function resetFormBaru() {
+            // Mempertahankan nama guru yang sama agar praktis untuk kelas berikutnya
+            const currentGuru = document.getElementById('namaGuru').value;
             document.getElementById('jurnalForm').reset();
+            document.getElementById('namaGuru').value = currentGuru;
             clearSignature();
             document.getElementById('containerAbsen').innerHTML = '';
             document.getElementById('jurnalForm').classList.remove('hidden');
             document.getElementById('alertSuccess').classList.add('hidden');
+            saveDraft();
         }
     </script>
 </body>
