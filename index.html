@@ -302,7 +302,8 @@
     </div>
 
     <script>
-        const scriptURL = 'MASUKKAN_URL_WEB_APP_APPS_SCRIPT_ANDA_DISINI'; // Ganti dengan URL deployment Web App Anda
+        // URL Web App Google Apps Script yang sudah diperbarui
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzGmEGsKyBVrTF6LlSTQOcYqsifFX3pNLdqV8ANaXceaNddlMKG6olAtlVpyw26vFDjZQ/exec';
 
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const tglSekarang = new Date().toLocaleDateString('id-ID', options);
@@ -487,89 +488,105 @@
         async function muatDataRekap() {
             const container = document.getElementById('containerListRekap');
             container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-slate-400 text-xs"><i class="fa-solid fa-spinner fa-spin text-lg mb-1"></i><p>Memuat data dari Google Sheets...</p></div>`;
-
+            
             try {
                 const response = await fetch(scriptURL);
                 const result = await response.json();
-                allDataJurnal = result.data || [];
-                tampilkanDataRekap(allDataJurnal);
+                
+                if(result.status === "success") {
+                    allDataJurnal = result.data || [];
+                    tampilkanDataRekap(allDataJurnal);
+                    hitungStatistik(allDataJurnal);
+                } else {
+                    container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-red-500 text-xs"><p>Gagal memuat data: ${result.message}</p></div>`;
+                }
             } catch (error) {
-                container.innerHTML = `<div class="bg-red-50 p-4 rounded-xl border border-red-200 text-center text-red-600 text-xs"><p>Gagal memuat rekap. Pastikan script Google Apps Script sudah di-deploy dengan benar.</p></div>`;
-                console.error(error);
+                container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-red-500 text-xs"><p>Terjadi kesalahan koneksi saat menarik data.</p></div>`;
             }
         }
 
         function tampilkanDataRekap(data) {
             const container = document.getElementById('containerListRekap');
-            document.getElementById('statTotal').textContent = data.length;
-            
-            // Hitung guru unik
-            const uniqueGuru = [...new Set(data.map(item => item.namaGuru))];
-            document.getElementById('statGuru').textContent = uniqueGuru.length;
-
             if(data.length === 0) {
-                container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-slate-400 text-xs"><p>Belum ada data jurnal tercatat.</p></div>`;
+                container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-slate-400 text-xs"><p>Belum ada data jurnal tersimpan.</p></div>`;
                 return;
             }
 
-            container.innerHTML = '';
-            // Urutkan dari yang terbaru (dibalik)
-            data.slice().reverse().forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-2 text-xs';
-                card.innerHTML = `
-                    <div class="flex justify-between items-start border-b pb-1.5">
-                        <div>
-                            <span class="bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded text-[10px]">${item.kelas}</span>
-                            <span class="font-semibold text-slate-700 ml-1">${item.mapel}</span>
+            let html = '';
+            // Urutkan dari data terbaru (opsional, jika perlu dibalik)
+            [...data].reverse().forEach((item, index) => {
+                html += `
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2 shadow-sm text-xs">
+                        <div class="flex justify-between items-center text-slate-500 border-b pb-1.5">
+                            <span class="font-semibold text-blue-800"><i class="fa-solid fa-calendar-days"></i> ${item.tanggal || '-'}</span>
+                            <span class="bg-slate-100 px-2 py-0.5 rounded font-bold text-slate-700">Kelas ${item.kelas || '-'}</span>
                         </div>
-                        <span class="text-[10px] text-slate-400">${item.timestamp}</span>
-                    </div>
-                    <div>
-                        <p class="font-bold text-slate-900">${item.namaGuru}</p>
-                        <p class="text-slate-600 mt-0.5"><strong>Materi:</strong> ${item.materi}</p>
-                        <p class="text-slate-500 text-[11px] mt-1"><strong>Absen:</strong> ${item.siswaAbsen}</p>
+                        <div>
+                            <p class="font-bold text-slate-800 text-sm">${item.namaGuru || '-'}</p>
+                            <p class="text-blue-600 font-semibold">${item.mapel || '-'} (${item.jamKe || '-'})</p>
+                        </div>
+                        <div class="bg-slate-50 p-2 rounded border border-slate-100 text-slate-600">
+                            <span class="font-semibold text-slate-700">Materi:</span> ${item.materi || '-'}
+                        </div>
+                        <div class="text-[11px] text-slate-500 flex justify-between pt-1">
+                            <span>Absen: ${item.siswaAbsen || 'Nihil'}</span>
+                        </div>
                     </div>
                 `;
-                container.appendChild(card);
             });
+            container.innerHTML = html;
+        }
+
+        function hitungStatistik(data) {
+            document.getElementById('statTotal').textContent = data.length;
+            const uniqueGuru = new Set(data.map(item => item.namaGuru));
+            document.getElementById('statGuru').textContent = uniqueGuru.size;
         }
 
         function filterDataRekap() {
             const keyword = document.getElementById('filterKeyword').value.toLowerCase();
-            const filtered = allDataJurnal.filter(item => 
-                item.namaGuru.toLowerCase().includes(keyword) ||
-                item.mapel.toLowerCase().includes(keyword) ||
-                item.materi.toLowerCase().includes(keyword) ||
-                item.kelas.toLowerCase().includes(keyword)
-            );
+            const filtered = allDataJurnal.filter(item => {
+                return (
+                    (item.namaGuru && item.namaGuru.toLowerCase().includes(keyword)) ||
+                    (item.mapel && item.mapel.toLowerCase().includes(keyword)) ||
+                    (item.materi && item.materi.toLowerCase().includes(keyword)) ||
+                    (item.kelas && item.kelas.toLowerCase().includes(keyword))
+                );
+            });
             tampilkanDataRekap(filtered);
         }
 
+        // --- FITUR DOWNLOAD PDF & WORD ---
         function downloadPDF() {
             const element = document.getElementById('printArea');
             element.classList.remove('hidden');
-            const opt = { margin: 10, filename: `Jurnal_KBM.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-            html2pdf().from(element).set(opt).save().then(() => { element.classList.add('hidden'); });
+            const opt = {
+                margin: 10,
+                filename: `Jurnal_KBM_${document.getElementById('kelas').value}_${document.getElementById('namaGuru').value.replace(/[^a-zA-Z]/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().from(element).set(opt).save().then(() => {
+                element.classList.add('hidden');
+            });
         }
 
         function downloadWord() {
             const element = document.getElementById('printArea');
             element.classList.remove('hidden');
-            const converted = htmlDocx.asBlob(element.innerHTML, {orientation: 'portrait'});
-            saveAs(converted, `Jurnal_KBM.docx`);
+            const contentHTML = element.innerHTML;
+            const converted = htmlDocx.asBlob(contentHTML);
+            saveAs(converted, `Jurnal_KBM_${document.getElementById('kelas').value}_${document.getElementById('namaGuru').value.replace(/[^a-zA-Z]/g, '_')}.docx`);
             element.classList.add('hidden');
         }
 
         function resetFormBaru() {
-            const currentGuru = document.getElementById('namaGuru').value;
+            document.getElementById('alertSuccess').classList.add('hidden');
+            document.getElementById('jurnalForm').classList.remove('hidden');
             document.getElementById('jurnalForm').reset();
-            document.getElementById('namaGuru').value = currentGuru;
             clearSignature();
             document.getElementById('containerAbsen').innerHTML = '';
-            document.getElementById('jurnalForm').classList.remove('hidden');
-            document.getElementById('alertSuccess').classList.add('hidden');
-            saveDraft();
         }
     </script>
 </body>
