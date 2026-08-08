@@ -7,6 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Library untuk Ekspor Word & PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body class="bg-slate-100 min-h-screen pb-10 text-slate-800 font-sans">
 
@@ -40,7 +44,7 @@
             <div class="text-right">
                 <p class="text-slate-500 text-xs">Database Status</p>
                 <span class="inline-flex items-center gap-1 text-emerald-600 text-xs font-semibold">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Google Sheets
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Terhubung
                 </span>
             </div>
         </div>
@@ -59,38 +63,19 @@
                     <select id="kelas" required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                         <option value="">-- Pilih Kelas --</option>
                         <optgroup label="Tingkat 7 (7A - 7I)">
-                            <option value="7A">Kelas 7A</option>
-                            <option value="7B">Kelas 7B</option>
-                            <option value="7C">Kelas 7C</option>
-                            <option value="7D">Kelas 7D</option>
-                            <option value="7E">Kelas 7E</option>
-                            <option value="7F">Kelas 7F</option>
-                            <option value="7G">Kelas 7G</option>
-                            <option value="7H">Kelas 7H</option>
-                            <option value="7I">Kelas 7I</option>
+                            <option value="7A">Kelas 7A</option><option value="7B">Kelas 7B</option><option value="7C">Kelas 7C</option>
+                            <option value="7D">Kelas 7D</option><option value="7E">Kelas 7E</option><option value="7F">Kelas 7F</option>
+                            <option value="7G">Kelas 7G</option><option value="7H">Kelas 7H</option><option value="7I">Kelas 7I</option>
                         </optgroup>
-                        <optgroup label="Tingkat 8 (8A - 8J)">
-                            <option value="8A">Kelas 8A</option>
-                            <option value="8B">Kelas 8B</option>
-                            <option value="8C">Kelas 8C</option>
-                            <option value="8D">Kelas 8D</option>
-                            <option value="8E">Kelas 8E</option>
-                            <option value="8F">Kelas 8F</option>
-                            <option value="8G">Kelas 8G</option>
-                            <option value="8H">Kelas 8H</option>
-                            <option value="8I">Kelas 8I</option>
-                            <option value="8J">Kelas 8J</option>
+                        <optgroup label="Tingkat 8 (8A - 8I)">
+                            <option value="8A">Kelas 8A</option><option value="8B">Kelas 8B</option><option value="8C">Kelas 8C</option>
+                            <option value="8D">Kelas 8D</option><option value="8E">Kelas 8E</option><option value="8F">Kelas 8F</option>
+                            <option value="8G">Kelas 8G</option><option value="8H">Kelas 8H</option><option value="8I">Kelas 8I</option>
                         </optgroup>
-                        <optgroup label="Tingkat 9 (9A - 9I)">
-                            <option value="9A">Kelas 9A</option>
-                            <option value="9B">Kelas 9B</option>
-                            <option value="9C">Kelas 9C</option>
-                            <option value="9D">Kelas 9D</option>
-                            <option value="9E">Kelas 9E</option>
-                            <option value="9F">Kelas 9F</option>
+                        <optgroup label="Tingkat 9 (9A - 9G)">
+                            <option value="9A">Kelas 9A</option><option value="9B">Kelas 9B</option><option value="9C">Kelas 9C</option>
+                            <option value="9D">Kelas 9D</option><option value="9E">Kelas 9E</option><option value="9F">Kelas 9F</option>
                             <option value="9G">Kelas 9G</option>
-                            <option value="9H">Kelas 9H</option>
-                            <option value="9I">Kelas 9I</option>
                         </optgroup>
                     </select>
                 </div>
@@ -99,17 +84,21 @@
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Mata Pelajaran <span class="text-red-500">*</span></label>
                     <select id="mapel" required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                         <option value="">-- Pilih Mapel --</option>
-                        <option value="Informatika">Informatika</option>
+                        <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option>
+                        <option value="Pendidikan Agama Kristen">Pendidikan Agama Kristen</option>
+                        <option value="Pkn">Pkn</option>
                         <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-                        <option value="Matematika">Matematika</option>
+                        <option value="Bahasa Inggris">Bahasa Inggris</option>
                         <option value="IPA">IPA</option>
                         <option value="IPS">IPS</option>
-                        <option value="Bahasa Inggris">Bahasa Inggris</option>
-                        <option value="PPKn">PPKn</option>
-                        <option value="PAI">PAI & Budi Pekerti</option>
-                        <option value="PJOK">PJOK</option>
+                        <option value="MTK">MTK</option>
                         <option value="Seni Budaya">Seni Budaya</option>
+                        <option value="Bahasa Lampung">Bahasa Lampung</option>
                         <option value="Prakarya">Prakarya</option>
+                        <option value="PJOK">PJOK</option>
+                        <option value="BK">BK</option>
+                        <option value="PAK">PAK</option>
+                        <option value="Informatika">Informatika</option>
                     </select>
                 </div>
             </div>
@@ -120,29 +109,15 @@
                 <div class="grid grid-cols-2 gap-3">
                     <select id="jamMulai" required class="bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                         <option value="">Dari Jam</option>
-                        <option value="1">Jam ke-1</option>
-                        <option value="2">Jam ke-2</option>
-                        <option value="3">Jam ke-3</option>
-                        <option value="4">Jam ke-4</option>
-                        <option value="5">Jam ke-5</option>
-                        <option value="6">Jam ke-6</option>
-                        <option value="7">Jam ke-7</option>
-                        <option value="8">Jam ke-8</option>
-                        <option value="9">Jam ke-9</option>
-                        <option value="10">Jam ke-10</option>
+                        <option value="1">Jam ke-1</option><option value="2">Jam ke-2</option><option value="3">Jam ke-3</option>
+                        <option value="4">Jam ke-4</option><option value="5">Jam ke-5</option><option value="6">Jam ke-6</option>
+                        <option value="7">Jam ke-7</option><option value="8">Jam ke-8</option><option value="9">Jam ke-9</option><option value="10">Jam ke-10</option>
                     </select>
                     <select id="jamSelesai" required class="bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
                         <option value="">Sampai Jam</option>
-                        <option value="1">Jam ke-1</option>
-                        <option value="2">Jam ke-2</option>
-                        <option value="3">Jam ke-3</option>
-                        <option value="4">Jam ke-4</option>
-                        <option value="5">Jam ke-5</option>
-                        <option value="6">Jam ke-6</option>
-                        <option value="7">Jam ke-7</option>
-                        <option value="8">Jam ke-8</option>
-                        <option value="9">Jam ke-9</option>
-                        <option value="10">Jam ke-10</option>
+                        <option value="1">Jam ke-1</option><option value="2">Jam ke-2</option><option value="3">Jam ke-3</option>
+                        <option value="4">Jam ke-4</option><option value="5">Jam ke-5</option><option value="6">Jam ke-6</option>
+                        <option value="7">Jam ke-7</option><option value="8">Jam ke-8</option><option value="9">Jam ke-9</option><option value="10">Jam ke-10</option>
                     </select>
                 </div>
             </div>
@@ -150,7 +125,7 @@
             <!-- 3. Ringkasan Materi -->
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Ringkasan Materi / Aktivitas <span class="text-red-500">*</span></label>
-                <textarea id="materi" required rows="3" placeholder="Contoh: Pengenalan Algoritma dan Pemrograman Sederhana." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
+                <textarea id="materi" required rows="3" placeholder="Contoh: Pengenalan Algoritma..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
             </div>
 
             <!-- 4. Absensi Ketidakhadiran -->
@@ -167,7 +142,7 @@
             <!-- 5. Catatan Perilaku -->
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Catatan Perilaku / Kejadian Khusus</label>
-                <input id="catatan" type="text" placeholder="Contoh: Diskusi kelompok berjalan sangat kondusif." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                <input id="catatan" type="text" placeholder="Contoh: Kondusif." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
 
             <!-- 6. Tanda Tangan Virtual -->
@@ -191,19 +166,60 @@
 
         </form>
 
-        <!-- Pesan Berhasil -->
-        <div id="alertSuccess" class="hidden bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl p-4 text-center text-xs space-y-2">
+        <!-- Pesan Berhasil & Menu Unduh Dokumen -->
+        <div id="alertSuccess" class="hidden bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl p-4 text-center text-xs space-y-3">
             <i class="fa-solid fa-circle-check text-2xl text-emerald-500"></i>
-            <p class="font-bold">Jurnal Berhasil Disimpan ke Google Sheets!</p>
-            <p class="text-slate-600">Data KBM dan Tanda Tangan Virtual telah terkirim ke database sekolah.</p>
-            <button onclick="resetForm()" class="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-xs font-semibold">Isi Jurnal Lagi</button>
+            <div>
+                <p class="font-bold text-sm">Jurnal Berhasil Disimpan!</p>
+                <p class="text-slate-600 text-xs">Data KBM telah masuk ke Google Sheets. Anda juga bisa mengunduh rekap laporan hari ini:</p>
+            </div>
+            
+            <!-- Tombol Cetak PDF & Word -->
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button onclick="downloadPDF()" class="bg-red-600 hover:bg-red-700 text-white p-2.5 rounded-lg font-semibold flex items-center justify-center gap-1.5 shadow">
+                    <i class="fa-solid fa-file-pdf"></i> Unduh PDF
+                </button>
+                <button onclick="downloadWord()" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-lg font-semibold flex items-center justify-center gap-1.5 shadow">
+                    <i class="fa-solid fa-file-word"></i> Unduh Word
+                </button>
+            </div>
+
+            <button onclick="resetForm()" class="w-full mt-2 bg-slate-200 hover:bg-slate-300 text-slate-700 py-2 rounded-lg font-semibold">
+                Isi Jurnal Baru Lagi
+            </button>
         </div>
 
     </main>
 
+    <!-- Template Tersembunyi untuk Format Cetak Laporan -->
+    <div id="printArea" class="hidden bg-white p-8 max-w-[210mm] mx-auto text-slate-800 text-sm font-serif">
+        <div class="text-center border-b-2 border-slate-800 pb-3 mb-4">
+            <h2 class="font-bold text-base uppercase">SMP NEGERI 8 BANDAR LAMPUNG</h2>
+            <h1 class="font-bold text-lg uppercase">JURNAL KEGIATAN BELAJAR MENGAJAR (KBM)</h1>
+            <p class="text-xs text-slate-600">Tahun Ajaran 2025/2026</p>
+        </div>
+        <table class="w-full mb-4 text-xs">
+            <tr><td class="py-1 font-semibold w-1/3">Hari / Tanggal</td><td class="py-1">: <span id="pTanggal"></span></td></tr>
+            <tr><td class="py-1 font-semibold">Mata Pelajaran</td><td class="py-1">: <span id="pMapel"></span></td></tr>
+            <tr><td class="py-1 font-semibold">Kelas / Jam Ke</td><td class="py-1">: <span id="pKelas"></span> / <span id="pJam"></span></td></tr>
+            <tr><td class="py-1 font-semibold">Ringkasan Materi</td><td class="py-1">: <span id="pMateri"></span></td></tr>
+            <tr><td class="py-1 font-semibold">Siswa Tidak Hadir</td><td class="py-1">: <span id="pAbsen"></span></td></tr>
+            <tr><td class="py-1 font-semibold">Catatan Perilaku</td><td class="py-1">: <span id="pCatatan"></span></td></tr>
+        </table>
+        <div class="flex justify-end mt-8">
+            <div class="text-center">
+                <p class="mb-1 text-xs">Bandar Lampung, <span id="pTglTtd"></span></p>
+                <p class="mb-12 text-xs font-semibold">Guru Mata Pelajaran</p>
+                <img id="pTtdImg" src="" class="h-16 mx-auto mb-1">
+                <p class="text-xs font-bold border-b border-slate-800 pb-0.5 px-4 inline-block">(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</p>
+            </div>
+        </div>
+    </div>
+
     <script>
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('id-ID', options);
+        const tglSekarang = new Date().toLocaleDateString('id-ID', options);
+        document.getElementById('currentDate').textContent = tglSekarang;
 
         const canvas = document.getElementById('signatureCanvas');
         const signaturePad = new SignaturePad(canvas, { penColor: 'rgb(30, 58, 138)' });
@@ -263,17 +279,34 @@
                 if(nama) daftarAbsen.push(`${nama} ${status}`);
             });
 
-            // GANTI DENGAN URL APPS SCRIPT ANDA YANG BERAKHIRAN /exec
-            const scriptURL = 'MASUKKAN_URL_EXEC_DI_SINI'; 
+            const kelasVal = document.getElementById('kelas').value;
+            const mapelVal = document.getElementById('mapel').value;
+            const jamVal = `Jam ${document.getElementById('jamMulai').value} - ${document.getElementById('jamSelesai').value}`;
+            const materiVal = document.getElementById('materi').value;
+            const absenVal = daftarAbsen.join(', ') || 'Nihil (Hadir Semua)';
+            const catatanVal = document.getElementById('catatan').value || '-';
+            const ttdVal = signaturePad.toDataURL();
+
+            document.getElementById('pTanggal').textContent = tglSekarang;
+            document.getElementById('pMapel').textContent = mapelVal;
+            document.getElementById('pKelas').textContent = kelasVal;
+            document.getElementById('pJam').textContent = jamVal;
+            document.getElementById('pMateri').textContent = materiVal;
+            document.getElementById('pAbsen').textContent = absenVal;
+            document.getElementById('pCatatan').textContent = catatanVal;
+            document.getElementById('pTglTtd').textContent = tglSekarang;
+            document.getElementById('pTtdImg').src = ttdVal;
+
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzGmEGsKyBVrTF6LlSTQOcYqsifFX3pNLdqV8ANaXceaNddlMKG6olAtlVpyw26vFDjZQ/exec'; 
 
             const payload = {
-                kelas: document.getElementById('kelas').value,
-                mapel: document.getElementById('mapel').value,
-                jamKe: `Jam ${document.getElementById('jamMulai').value} - ${document.getElementById('jamSelesai').value}`,
-                materi: document.getElementById('materi').value,
-                siswaAbsen: daftarAbsen.join(', ') || 'Nihil (Hadir Semua)',
-                catatan: document.getElementById('catatan').value || '-',
-                tandaTangan: signaturePad.toDataURL()
+                kelas: kelasVal,
+                mapel: mapelVal,
+                jamKe: jamVal,
+                materi: materiVal,
+                siswaAbsen: absenVal,
+                catatan: catatanVal,
+                tandaTangan: ttdVal
             };
 
             try {
@@ -293,6 +326,30 @@
                 btnSubmit.disabled = false;
                 btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Simpan & Kirim ke Google Sheets`;
             }
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('printArea');
+            element.classList.remove('hidden');
+            const opt = {
+                margin:       10,
+                filename:     `Jurnal_KBM_${document.getElementById('pKelas').textContent}_${document.getElementById('pMapel').textContent}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().from(element).set(opt).save().then(() => {
+                element.classList.add('hidden');
+            });
+        }
+
+        function downloadWord() {
+            const element = document.getElementById('printArea');
+            element.classList.remove('hidden');
+            const contentHTML = element.innerHTML;
+            const converted = htmlDocx.asBlob(contentHTML, {orientation: 'portrait'});
+            saveAs(converted, `Jurnal_KBM_${document.getElementById('pKelas').textContent}_${document.getElementById('pMapel').textContent}.docx`);
+            element.classList.add('hidden');
         }
 
         function resetForm() {
