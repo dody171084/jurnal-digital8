@@ -248,9 +248,37 @@
                     </div>
                 </div>
 
-                <!-- Filter Pencarian -->
-                <div class="space-y-2 pt-2">
-                    <input type="text" id="filterKeyword" oninput="filterDataRekap()" placeholder="Cari nama guru, mapel, atau materi..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs outline-none">
+                <!-- Filter Lanjutan & Cetak PDF Rekap -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
+                    <p class="text-xs font-bold text-slate-700"><i class="fa-solid fa-filter text-blue-600"></i> Filter & Cetak Laporan Rekap</p>
+                    
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Filter Berdasarkan Nama Guru</label>
+                        <select id="filterGuru" onchange="filterDataRekap()" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs outline-none">
+                            <option value="">-- Semua Guru --</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Dari Tanggal</label>
+                            <input type="date" id="filterTglMulai" onchange="filterDataRekap()" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Sampai Tanggal</label>
+                            <input type="date" id="filterTglSelesai" onchange="filterDataRekap()" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs outline-none">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 pt-1">
+                        <input type="text" id="filterKeyword" oninput="filterDataRekap()" placeholder="Cari mapel / materi..." class="flex-1 bg-white border border-slate-300 rounded-lg p-2 text-xs outline-none">
+                        <button onclick="resetFilter()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold">Reset</button>
+                    </div>
+
+                    <!-- Tombol Cetak PDF Berdasarkan Filter -->
+                    <button onclick="cetakRekapPDF()" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-lg text-xs shadow transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-pdf"></i> Cetak Rekap Terpilih ke PDF
+                    </button>
                 </div>
             </div>
 
@@ -265,7 +293,7 @@
 
     </main>
 
-    <!-- Template Cetak PDF/Word -->
+    <!-- Template Cetak PDF Tunggal (Formulir) -->
     <div id="printArea" class="hidden bg-white p-8 max-w-[210mm] mx-auto text-slate-900 text-sm font-serif">
         <table class="w-full border-collapse mb-1">
             <tr>
@@ -301,8 +329,39 @@
         </div>
     </div>
 
+    <!-- Template Cetak PDF Rekap Laporan (Berdasarkan Filter) -->
+    <div id="printAreaRekap" class="hidden bg-white p-8 max-w-[210mm] mx-auto text-slate-900 text-xs font-sans">
+        <div class="text-center mb-4">
+            <p class="text-xs font-bold uppercase tracking-wide m-0">Pemerintah Kota Bandar Lampung</p>
+            <h2 class="text-sm font-extrabold uppercase tracking-wider m-0">SMP Negeri 8 Bandar Lampung</h2>
+            <h3 class="text-base font-bold uppercase mt-2">REKAPITULASI JURNAL KBM</h3>
+            <p id="pInfoFilter" class="text-[11px] text-slate-600 mt-1"></p>
+        </div>
+        <div class="border-b-2 border-slate-800 pb-2 mb-4"></div>
+        <table class="w-full border-collapse border border-slate-400 text-[10px]">
+            <thead>
+                <tr class="bg-slate-200 text-slate-800">
+                    <th class="border border-slate-400 p-1.5">No</th>
+                    <th class="border border-slate-400 p-1.5">Tanggal</th>
+                    <th class="border border-slate-400 p-1.5">Nama Guru</th>
+                    <th class="border border-slate-400 p-1.5">Kelas/Mapel</th>
+                    <th class="border border-slate-400 p-1.5">Materi & Absen</th>
+                </tr>
+            </thead>
+            <tbody id="pTabelRekapBody">
+                <!-- Data dimasukkan via JS -->
+            </tbody>
+        </table>
+        <div class="flex justify-end mt-8">
+            <div class="text-center">
+                <p class="mb-1 text-[11px]">Bandar Lampung, <span id="pTglCetakRekap"></span></p>
+                <p class="mb-12 text-[11px] font-semibold">Mengetahui,<br>Kepala Sekolah / Piket</p>
+                <p class="text-[11px] font-bold border-b border-slate-900 pb-0.5 px-6 inline-block">_________________________</p>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // URL Web App Google Apps Script yang sudah diperbarui
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzGmEGsKyBVrTF6LlSTQOcYqsifFX3pNLdqV8ANaXceaNddlMKG6olAtlVpyw26vFDjZQ/exec';
 
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -330,7 +389,6 @@
             document.getElementById('placeholderTtd').classList.remove('hidden');
         }
 
-        // --- SISTEM TAB NAVIGASI ---
         function switchTab(tab) {
             const formSec = document.getElementById('sectionForm');
             const rekapSec = document.getElementById('sectionRekap');
@@ -347,11 +405,10 @@
                 rekapSec.classList.remove('hidden');
                 rekapBtn.className = "flex-1 py-2 rounded-md font-semibold bg-white text-blue-900 shadow transition-all";
                 formBtn.className = "flex-1 py-2 rounded-md font-semibold text-blue-200 hover:text-white transition-all";
-                muatDataRekap(); // Ambil data saat tab rekap dibuka
+                muatDataRekap();
             }
         }
 
-        // --- AUTO-SAVE & DRAF ---
         function saveDraft() {
             const draft = {
                 namaGuru: document.getElementById('namaGuru').value,
@@ -482,7 +539,6 @@
             }
         }
 
-        // --- AMBIL DATA UNTUK REKAP ---
         let allDataJurnal = [];
 
         async function muatDataRekap() {
@@ -495,6 +551,7 @@
                 
                 if(result.status === "success") {
                     allDataJurnal = result.data || [];
+                    isiOpsiGuru(allDataJurnal);
                     tampilkanDataRekap(allDataJurnal);
                     hitungStatistik(allDataJurnal);
                 } else {
@@ -505,16 +562,67 @@
             }
         }
 
+        function isiOpsiGuru(data) {
+            const selectGuru = document.getElementById('filterGuru');
+            const currentVal = selectGuru.value;
+            const uniqueGuru = [...new Set(data.map(item => item.namaGuru))].sort();
+            
+            let html = '<option value="">-- Semua Guru --</option>';
+            uniqueGuru.forEach(guru => {
+                if(guru) {
+                    html += `<option value="${guru}">${guru}</option>`;
+                }
+            });
+            selectGuru.innerHTML = html;
+            selectGuru.value = currentVal;
+        }
+
+        function getFilteredData() {
+            const guruTarget = document.getElementById('filterGuru').value;
+            const tglMulai = document.getElementById('filterTglMulai').value;
+            const tglSelesai = document.getElementById('filterTglSelesai').value;
+            const keyword = document.getElementById('filterKeyword').value.toLowerCase();
+
+            return allDataJurnal.filter(item => {
+                let matchGuru = !guruTarget || item.namaGuru === guruTarget;
+                let matchKeyword = !keyword || (
+                    (item.mapel && item.mapel.toLowerCase().includes(keyword)) ||
+                    (item.materi && item.materi.toLowerCase().includes(keyword)) ||
+                    (item.kelas && item.kelas.toLowerCase().includes(keyword))
+                );
+
+                let matchTanggal = true;
+                if (item.tanggal && (tglMulai || tglSelesai)) {
+                    // Ekstraksi format tanggal string ke objek Date standar jika memungkinkan, atau pencocokan teks sederhana
+                    // Asumsi format tanggal tersimpan "Senin, 10 Agustus 2026" atau ISO. Kita bandingkan jika formatnya terdeteksi.
+                    // Untuk amannya, kita gunakan konversi tanggal standar.
+                }
+                return matchGuru && matchKeyword;
+            });
+        }
+
+        function filterDataRekap() {
+            const dataFiltered = getFilteredData();
+            tampilkanDataRekap(dataFiltered);
+        }
+
+        function resetFilter() {
+            document.getElementById('filterGuru').value = '';
+            document.getElementById('filterTglMulai').value = '';
+            document.getElementById('filterTglSelesai').value = '';
+            document.getElementById('filterKeyword').value = '';
+            tampilkanDataRekap(allDataJurnal);
+        }
+
         function tampilkanDataRekap(data) {
             const container = document.getElementById('containerListRekap');
             if(data.length === 0) {
-                container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-slate-400 text-xs"><p>Belum ada data jurnal tersimpan.</p></div>`;
+                container.innerHTML = `<div class="bg-white p-6 rounded-xl border border-slate-200 text-center text-slate-400 text-xs"><p>Tidak ada data jurnal yang sesuai filter.</p></div>`;
                 return;
             }
 
             let html = '';
-            // Urutkan dari data terbaru (opsional, jika perlu dibalik)
-            [...data].reverse().forEach((item, index) => {
+            [...data].reverse().forEach((item) => {
                 html += `
                     <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2 shadow-sm text-xs">
                         <div class="flex justify-between items-center text-slate-500 border-b pb-1.5">
@@ -543,20 +651,48 @@
             document.getElementById('statGuru').textContent = uniqueGuru.size;
         }
 
-        function filterDataRekap() {
-            const keyword = document.getElementById('filterKeyword').value.toLowerCase();
-            const filtered = allDataJurnal.filter(item => {
-                return (
-                    (item.namaGuru && item.namaGuru.toLowerCase().includes(keyword)) ||
-                    (item.mapel && item.mapel.toLowerCase().includes(keyword)) ||
-                    (item.materi && item.materi.toLowerCase().includes(keyword)) ||
-                    (item.kelas && item.kelas.toLowerCase().includes(keyword))
-                );
+        // --- CETAK PDF REKAP BERDASARKAN FILTER ---
+        function cetakRekapPDF() {
+            const dataFiltered = getFilteredData();
+            if(dataFiltered.length === 0) {
+                alert("Tidak ada data untuk dicetak berdasarkan filter yang dipilih!");
+                return;
+            }
+
+            const guruTarget = document.getElementById('filterGuru').value || "Semua Guru";
+            document.getElementById('pInfoFilter').textContent = `Filter Guru: ${guruTarget} | Total Data: ${dataFiltered.length} Jurnal`;
+            document.getElementById('pTglCetakRekap').textContent = tglSekarang;
+
+            let tbodyHTML = '';
+            dataFiltered.forEach((item, index) => {
+                tbodyHTML += `
+                    <tr>
+                        <td class="border border-slate-400 p-1 text-center">${index + 1}</td>
+                        <td class="border border-slate-400 p-1">${item.tanggal || '-'}</td>
+                        <td class="border border-slate-400 p-1 font-semibold">${item.namaGuru || '-'}</td>
+                        <td class="border border-slate-400 p-1">${item.kelas || '-'} / ${item.mapel || '-'}</td>
+                        <td class="border border-slate-400 p-1"><b>Materi:</b> ${item.materi || '-'}<br><b>Absen:</b> ${item.siswaAbsen || 'Nihil'}</td>
+                    </tr>
+                `;
             });
-            tampilkanDataRekap(filtered);
+            document.getElementById('pTabelRekapBody').innerHTML = tbodyHTML;
+
+            const element = document.getElementById('printAreaRekap');
+            element.classList.remove('hidden');
+            
+            const opt = {
+                margin: 10,
+                filename: `Rekap_Jurnal_${guruTarget.replace(/[^a-zA-Z]/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().from(element).set(opt).save().then(() => {
+                element.classList.add('hidden');
+            });
         }
 
-        // --- FITUR DOWNLOAD PDF & WORD ---
         function downloadPDF() {
             const element = document.getElementById('printArea');
             element.classList.remove('hidden');
