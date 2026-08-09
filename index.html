@@ -10,6 +10,77 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+<style>
+/* =========================================================
+   PDF / PRINT FIX
+   Footer rekap dibuat eksplisit agar tidak hilang saat
+   html2pdf merender elemen.
+   ========================================================= */
+.rekap-signature {
+    display: block !important;
+    width: 250px;
+    margin-left: auto;
+    margin-top: 36px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    color: #0f172a;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.rekap-signature .signature-date {
+    margin: 0 0 5px 0;
+}
+
+.rekap-signature .signature-position {
+    margin: 0 0 58px 0;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.rekap-signature .signature-name {
+    margin: 0;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+#printAreaRekap {
+    width: 190mm;
+    min-height: 100mm;
+    background: #fff !important;
+}
+
+#pTabelRekapBody tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.pdf-rendering {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    z-index: 99999 !important;
+}
+
+@media print {
+    #footerRekap,
+    #pTglCetakRekap,
+    #pJabatanKoordinator,
+    #pNamaKoordinator {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen pb-10 text-slate-800 font-sans">
 
@@ -352,17 +423,27 @@
                 <!-- Data dimasukkan via JS -->
             </tbody>
         </table>
-        <div class="flex justify-end mt-8 pb-50">
-            <div class="text-center">
-                <p class="mb-1 text-[11px]">Bandar Lampung, <span id="pTglCetakRekap"></span></p>
-                <p class="mb-12 text-[11px] font-semibold">Mengetahui,<br>Koordinator Piket</p>
-                <p class="text-[11px] font-semibold underline">Nama Koordinator</p>
-            </div>
+        <div id="footerRekap" class="rekap-signature">
+            <p class="signature-date">Bandar Lampung, <span id="pTglCetakRekap"></span></p>
+            <p class="signature-position">
+                Mengetahui,<br>
+                <span id="pJabatanKoordinator">Koordinator Piket</span>
+            </p>
+            <p id="pNamaKoordinator" class="signature-name">Nama Koordinator</p>
         </div>
     </div>
 
     <script>
+        // URL Web App Apps Script. Jika melakukan deployment baru,
+        // ganti URL ini dengan URL /exec yang baru.
         const scriptURL = 'https://script.google.com/macros/s/AKfycbxj6QWbWVSA6Q0mZKGD9hGdlj8V1MceEe3KkLqcYRVFv4bJGQujoU1f0g99eeS3KhWEYw/exec';
+
+        let appConfig = {
+            namaKoordinator: 'Nama Koordinator',
+            jabatanKoordinator: 'Koordinator Piket',
+            kota: 'Bandar Lampung',
+            sekolah: 'SMP Negeri 8 Bandar Lampung'
+        };
 
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const tglSekarang = new Date().toLocaleDateString('id-ID', options);
@@ -438,7 +519,9 @@
                 if(data.catatan) document.getElementById('catatan').value = data.catatan;
             }
         }
-        window.addEventListener('DOMContentLoaded', loadDraft);
+        window.addEventListener('DOMContentLoaded', () => {
+            loadDraft();
+        });
 
         function resetDraftManual() {
             if(confirm("Yakin ingin menghapus seluruh isian form?")) {
@@ -551,6 +634,15 @@
                 
                 if(result.status === "success") {
                     allDataJurnal = result.data || [];
+
+                    appConfig = Object.assign({}, appConfig, result.config || {});
+
+                    document.getElementById('pNamaKoordinator').textContent =
+                        appConfig.namaKoordinator || 'Nama Koordinator';
+
+                    document.getElementById('pJabatanKoordinator').textContent =
+                        appConfig.jabatanKoordinator || 'Koordinator Piket';
+
                     isiOpsiGuru(allDataJurnal);
                     tampilkanDataRekap(allDataJurnal);
                     hitungStatistik(allDataJurnal);
@@ -577,10 +669,32 @@
             selectGuru.value = currentVal;
         }
 
+        function parseTanggalJurnal(value) {
+            if (!value) return null;
+
+            const match = String(value).match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+            if (!match) return null;
+
+            return new Date(
+                Number(match[3]),
+                Number(match[2]) - 1,
+                Number(match[1])
+            );
+        }
+
+        function getFilterDate(value) {
+            if (!value) return null;
+
+            const parts = value.split('-').map(Number);
+            if (parts.length !== 3) return null;
+
+            return new Date(parts[0], parts[1] - 1, parts[2]);
+        }
+
         function getFilteredData() {
             const guruTarget = document.getElementById('filterGuru').value;
-            const tglMulai = document.getElementById('filterTglMulai').value;
-            const tglSelesai = document.getElementById('filterTglSelesai').value;
+            const tglMulai = getFilterDate(document.getElementById('filterTglMulai').value);
+            const tglSelesai = getFilterDate(document.getElementById('filterTglSelesai').value);
             const keyword = document.getElementById('filterKeyword').value.toLowerCase();
 
             return allDataJurnal.filter(item => {
@@ -592,12 +706,23 @@
                 );
 
                 let matchTanggal = true;
-                if (item.tanggal && (tglMulai || tglSelesai)) {
-                    // Ekstraksi format tanggal string ke objek Date standar jika memungkinkan, atau pencocokan teks sederhana
-                    // Asumsi format tanggal tersimpan "Senin, 10 Agustus 2026" atau ISO. Kita bandingkan jika formatnya terdeteksi.
-                    // Untuk amannya, kita gunakan konversi tanggal standar.
+
+                const itemDate = parseTanggalJurnal(item.tanggal);
+
+                if (tglMulai || tglSelesai) {
+                    if (!itemDate) {
+                        matchTanggal = false;
+                    } else {
+                        if (tglMulai) {
+                            matchTanggal = matchTanggal && itemDate >= tglMulai;
+                        }
+                        if (tglSelesai) {
+                            matchTanggal = matchTanggal && itemDate <= tglSelesai;
+                        }
+                    }
                 }
-                return matchGuru && matchKeyword;
+
+                return matchGuru && matchKeyword && matchTanggal;
             });
         }
 
@@ -626,18 +751,18 @@
                 html += `
                     <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2 shadow-sm text-xs">
                         <div class="flex justify-between items-center text-slate-500 border-b pb-1.5">
-                            <span class="font-semibold text-blue-800"><i class="fa-solid fa-calendar-days"></i> ${item.tanggal || '-'}</span>
-                            <span class="bg-slate-100 px-2 py-0.5 rounded font-bold text-slate-700">Kelas ${item.kelas || '-'}</span>
+                            <span class="font-semibold text-blue-800"><i class="fa-solid fa-calendar-days"></i> ${escapeHtml(item.tanggal || '-')}</span>
+                            <span class="bg-slate-100 px-2 py-0.5 rounded font-bold text-slate-700">Kelas ${escapeHtml(item.kelas || '-')}</span>
                         </div>
                         <div>
-                            <p class="font-bold text-slate-800 text-sm">${item.namaGuru || '-'}</p>
-                            <p class="text-blue-600 font-semibold">${item.mapel || '-'} (${item.jamKe || '-'})</p>
+                            <p class="font-bold text-slate-800 text-sm">${escapeHtml(item.namaGuru || '-')}</p>
+                            <p class="text-blue-600 font-semibold">${escapeHtml(item.mapel || '-')} (${escapeHtml(item.jamKe || '-')})</p>
                         </div>
                         <div class="bg-slate-50 p-2 rounded border border-slate-100 text-slate-600">
-                            <span class="font-semibold text-slate-700">Materi:</span> ${item.materi || '-'}
+                            <span class="font-semibold text-slate-700">Materi:</span> ${escapeHtml(item.materi || '-')}
                         </div>
                         <div class="text-[11px] text-slate-500 flex justify-between pt-1">
-                            <span>Absen: ${item.siswaAbsen || 'Nihil'}</span>
+                            <span>Absen: ${escapeHtml(item.siswaAbsen || 'Nihil')}</span>
                         </div>
                     </div>
                 `;
@@ -652,50 +777,123 @@
         }
 
         // --- CETAK PDF REKAP BERDASARKAN FILTER ---
-        function cetakRekapPDF() {
+        async function cetakRekapPDF() {
             const dataFiltered = getFilteredData();
+
             if(dataFiltered.length === 0) {
                 alert("Tidak ada data untuk dicetak berdasarkan filter yang dipilih!");
                 return;
             }
 
-            const guruTarget = document.getElementById('filterGuru').value || "Semua Guru";
-            document.getElementById('pInfoFilter').textContent = `Filter Guru: ${guruTarget} | Total Data: ${dataFiltered.length} Jurnal`;
-            document.getElementById('pTglCetakRekap').textContent = tglSekarang;
+            const guruTarget =
+                document.getElementById('filterGuru').value || "Semua Guru";
+
+            document.getElementById('pInfoFilter').textContent =
+                `Filter Guru: ${guruTarget} | Total Data: ${dataFiltered.length} Jurnal`;
+
+            document.getElementById('pTglCetakRekap').textContent =
+                new Date().toLocaleDateString('id-ID', options);
+
+            document.getElementById('pJabatanKoordinator').textContent =
+                appConfig.jabatanKoordinator || 'Koordinator Piket';
+
+            document.getElementById('pNamaKoordinator').textContent =
+                appConfig.namaKoordinator || 'Nama Koordinator';
 
             let tbodyHTML = '';
+
             dataFiltered.forEach((item, index) => {
                 tbodyHTML += `
                     <tr>
                         <td class="border border-slate-400 p-1 text-center">${index + 1}</td>
-                        <td class="border border-slate-400 p-1">${item.tanggal || '-'}</td>
-                        <td class="border border-slate-400 p-1 font-semibold">${item.namaGuru || '-'}</td>
-                        <td class="border border-slate-400 p-1">${item.kelas || '-'} / ${item.mapel || '-'}</td>
-                        <td class="border border-slate-400 p-1"><b>Materi:</b> ${item.materi || '-'}<br><b>Absen:</b> ${item.siswaAbsen || 'Nihil'}</td>
+                        <td class="border border-slate-400 p-1">${escapeHtml(item.tanggal || '-')}</td>
+                        <td class="border border-slate-400 p-1 font-semibold">${escapeHtml(item.namaGuru || '-')}</td>
+                        <td class="border border-slate-400 p-1">${escapeHtml(item.kelas || '-')} / ${escapeHtml(item.mapel || '-')}</td>
+                        <td class="border border-slate-400 p-1">
+                            <b>Materi:</b> ${escapeHtml(item.materi || '-')}<br>
+                            <b>Absen:</b> ${escapeHtml(item.siswaAbsen || 'Nihil')}
+                        </td>
                     </tr>
                 `;
             });
+
             document.getElementById('pTabelRekapBody').innerHTML = tbodyHTML;
 
             const element = document.getElementById('printAreaRekap');
+
+            // Hapus hidden dan paksa elemen terlihat.
             element.classList.remove('hidden');
-            
+            element.classList.add('pdf-rendering');
+
+            const footer = document.getElementById('footerRekap');
+            footer.style.display = 'block';
+            footer.style.visibility = 'visible';
+            footer.style.opacity = '1';
+
+            // Beri waktu browser menyelesaikan layout sebelum html2canvas.
+            await new Promise(resolve =>
+                requestAnimationFrame(() => setTimeout(resolve, 300))
+            );
+
             const opt = {
-                margin: 10,
-                filename: `Rekap_Jurnal_${guruTarget.replace(/[^a-zA-Z]/g, '_')}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                margin: [8, 8, 8, 8],
+                filename: `Rekap_Jurnal_${sanitizeFilename(guruTarget)}.pdf`,
+                image: {
+                    type: 'jpeg',
+                    quality: 0.98
+                },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF: {
+                    unit: 'mm',
+                    format: 'a4',
+                    orientation: 'portrait',
+                    compress: true
+                },
+                pagebreak: {
+                    mode: ['css', 'legacy'],
+                    avoid: ['tr', '#footerRekap']
+                }
             };
 
-            html2pdf().from(element).set(opt).save().then(() => {
+            try {
+                await html2pdf()
+                    .set(opt)
+                    .from(element)
+                    .save();
+            } finally {
+                element.classList.remove('pdf-rendering');
                 element.classList.add('hidden');
-            });
+                footer.style.display = '';
+                footer.style.visibility = '';
+                footer.style.opacity = '';
+            }
+        }
+
+        function sanitizeFilename(value) {
+            return String(value || 'dokumen')
+                .replace(/[^a-zA-Z0-9_-]+/g, '_');
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         function downloadPDF() {
             const element = document.getElementById('printArea');
             element.classList.remove('hidden');
+            element.classList.add('pdf-rendering');
             const opt = {
                 margin: 10,
                 filename: `Jurnal_KBM_${document.getElementById('kelas').value}_${document.getElementById('namaGuru').value.replace(/[^a-zA-Z]/g, '_')}.pdf`,
@@ -704,6 +902,7 @@
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
             html2pdf().from(element).set(opt).save().then(() => {
+                element.classList.remove('pdf-rendering');
                 element.classList.add('hidden');
             });
         }
